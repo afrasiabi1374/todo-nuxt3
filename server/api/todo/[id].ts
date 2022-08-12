@@ -11,7 +11,7 @@ export default defineEventHandler((e) => {
         const todo = db.todos.find((t , i) => {
             if (t.id === id) {
                 index = i
-                return true
+                return true 
             }
             return false
         })
