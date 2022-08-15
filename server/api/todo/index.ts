@@ -1,5 +1,6 @@
 import {db} from "../../db"
 import {v4 as uuid} from "uuid"
+import {sendError} from "h3"
 export default defineCachedEventHandler(
     async (e) => {
         // console.log(e);
@@ -11,7 +12,16 @@ export default defineCachedEventHandler(
             const body = await useBody(e)
             console.log({body});
             // اگه خالی بود ارور بده
-            if (!body.item) throw new Error()
+            if (!body.item) {
+                const TodoNotFoundError = ({
+                    statusCode: 400,
+                    statusMessage: "no item provided alii joonam!",
+                    data: {
+    
+                    }
+                })
+                sendError(e, TodoNotFoundError)                
+            }
             const newTodo = {
                 id : uuid(),
                 item: body.item,

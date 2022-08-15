@@ -4,6 +4,10 @@
 <template>
   <div>
   {{data}}
+    <div class="n-card n-card-base">
+      sdsdsd
+      <slot />
+    </div>
     <NuxtWelcome />
   </div>
 </template>

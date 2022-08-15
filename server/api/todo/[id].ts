@@ -1,30 +1,47 @@
 import {db} from "../../db"
+import {createError, sendError} from "h3"
 export default defineEventHandler((e) => {
     const method = e.req.method
     const context = e.context
-    console.log(e.context)
-    if (method === "PUT") {
-        // 1) extract the path param
-        const { id } = context.params
-        // 2) find todo in db
+
+    const { id } = context.params
+    const findTodoById = (todoId) => {
         let index
         const todo = db.todos.find((t , i) => {
-            if (t.id === id) {
+            if (t.id === todoId) {
                 index = i
                 return true 
             }
             return false
         })
 
-        // 3) throw error if todo  is not found
-        if (!todo) throw new Error()
-        // 4) update the completed status
+        if (!todo) {
+            const TodoNotFoundError = ({
+                statusCode: 404,
+                statusMessage: "Todo Not Found aliafrasiabi1374",
+                data: {
+
+                }
+            })
+            sendError(e, TodoNotFoundError)
+        }
+        return {todo, index}
+    }
+    console.log(e.context)
+    if (method === "PUT") {
+        const {todo, index} = findTodoById(id)
         const updateTodo = {
             ...todo,
             completed: !todo.completed
         }
         db.todos[index] = updateTodo
-        // 5) return the updated todo
         return updateTodo
+    }
+    if(method === "DELETE"){
+        const {index} = findTodoById(id)
+        db.todos.splice(index, 1)
+        return {
+            message: "item is deleted!"
+        }
     }
 })
